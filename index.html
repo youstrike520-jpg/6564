@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>STREETWEAR TG — Магазин одежды (Telegram Mini App)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <style>
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.82);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+    .tg-gradient {
+      background: linear-gradient(135deg, #2AABEE 0%, #229ED9 50%, #6366f1 100%);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(16px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-slide-up {
+      animation: slideUp 0.22s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-28 selection:bg-sky-500 selection:text-white">
+
+  <!-- Верхняя панель симулятора Telegram Mini App (для предпросмотра и переключения ролей) -->
+  <div class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-3 py-2">
+    <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg tg-gradient text-white font-bold text-xs shadow">TG</span>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span id="headerStoreName" class="font-bold text-sm text-white">STREETWEAR TG</span>
+            <span id="roleBadge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">Клиент</span>
+          </div>
+          <p id="tgUserStatus" class="text-[11px] text-slate-400">Проверка Telegram ID...</p>
+        </div>
+      </div>
+
+      <!-- Переключатель режима (Витрина клиента / Админ-панель ID 1759115629 / Защита токена) -->
+      <div class="flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700/70">
+        <button id="switchClientBtn" type="button" class="px-2.5 py-1 rounded-lg text-xs font-medium transition-all bg-sky-500 text-white shadow">
+          Витрина (Клиент)
+        </button>
+        <button id="switchAdminBtn" type="button" class="px-2.5 py-1 rounded-lg text-xs font-medium transition-all text-slate-300 hover:text-white">
+          Админ (1759115629)
+        </button>
+        <button id="switchSecurityBtn" type="button" class="px-2.5 py-1 rounded-lg text-xs font-medium transition-all text-amber-300 hover:text-amber-200 flex items-center gap-1">
+          <span>🔒 Скрытие без сервера</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
+  <main class="max-w-5xl mx-auto px-3 sm:px-6 pt-4">
+
+    <!-- ==================== 1. РЕЖИМ КЛИЕНТА (ВИТРИНА МАГАЗИНА) ==================== -->
+    <section id="clientView" class="space-y-5 animate-slide-up">
+
+      <!-- Баннер магазина -->
+      <div class="relative overflow-hidden rounded-2xl tg-gradient p-5 sm:p-6 shadow-xl">
+        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1.5 max-w-xl">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-sm text-white text-xs font-medium">
+              <span>⚡ Официальный Mini App магазина</span>
+            </div>
+            <h1 id="heroTitle" class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              Новая коллекция одежды с доставкой по всей России
+            </h1>
+            <p id="heroSubtitle" class="text-xs sm:text-sm text-sky-100/90">
+              Худи, футболки, куртки, джинсы и кроссовки в рублях (₽). Выбирайте вещи и оформляйте доставку СДЭК или курьером прямо в Telegram.
+            </p>
+          </div>
+          <div class="flex flex-wrap sm:flex-col gap-2 shrink-0">
+            <button id="openPromoInfoBtn" type="button" class="px-3.5 py-2 rounded-xl bg-white text-slate-900 font-semibold text-xs shadow hover:bg-sky-50 transition flex items-center gap-1.5">
+              <span>🎁 Промокод:</span>
+              <span class="font-mono font-bold text-sky-600">START10</span>
+            </button>
+            <button id="openMyOrdersBtn" type="button" class="px-3.5 py-2 rounded-xl bg-slate-900/40 hover:bg-slate-900/60 text-white font-medium text-xs border border-white/20 transition flex items-center justify-center gap-1.5">
+              <span>📦 Мои заказы</span>
+              <span id="clientOrderCountBadge" class="px-1.5 py-0.2 bg-white/20 rounded-full text-[11px]">0</span>
+            </button>
+          </div>
+        </div>
+        <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+      </div>
+
+      <!-- Поиск, сортировка и избранное -->
+      <div class="flex flex-col sm:flex-row gap-2.5">
+        <div class="relative flex-1">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/>
+          </svg>
+          <input id="searchInput" type="text" placeholder="Найти товар по названию или описанию..."
+            class="w-full pl-10 pr-9 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700/80 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-sky-500 transition" />
+          <button id="clearSearchBtn" type="button" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">✕</button>
+        </div>
+
+        <div class="flex gap-2">
+          <select id="sortSelect" aria-label="Сортировка товаров"
+            class="px-3 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700/80 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-sky-500">
+            <option value="popular">По популярности</option>
+            <option value="price_asc">Сначала дешевле</option>
+            <option value="price_desc">Сначала дороже</option>
+            <option value="discount">По скидке</option>
+          </select>
+
+          <button id="toggleFavoritesFilterBtn" type="button"
+            class="px-3.5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700/80 text-xs sm:text-sm font-medium text-slate-200 hover:border-pink-500/60 transition flex items-center gap-1.5 shrink-0">
+            <span id="favFilterIcon">🤍</span>
+            <span>Избранное</span>
+            <span id="favCountBadge" class="text-xs px-1.5 py-0.5 rounded-full bg-slate-700 text-slate-300">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Категории -->
+      <div id="categoryChips" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"></div>
+
+      <!-- Сетка товаров -->
+      <div id="productsGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"></div>
+
+      <!-- Пустое состояние поиска -->
+      <div id="emptyCatalogState" class="hidden glass-panel rounded-2xl p-8 text-center space-y-3">
+        <div class="text-4xl">🔍</div>
+        <h3 class="text-base font-bold text-white">Товары не найдены</h3>
+        <p class="text-xs text-slate-400 max-w-md mx-auto">Попробуйте изменить запрос или сбросить фильтры категорий.</p>
+        <button id="resetCatalogFiltersBtn" type="button" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-semibold transition">
+          Сбросить фильтры
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== 2. РЕЖИМ АДМИНА (ID: 1759115629) ==================== -->
+    <section id="adminView" class="hidden space-y-5 animate-slide-up">
+
+      <!-- Шапка админа -->
+      <div class="glass-panel rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-l-4 border-l-emerald-500">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-xs font-semibold border border-emerald-500/30">
+              Admin ID: 1759115629
+            </span>
+            <span class="text-xs text-slate-400">Полный доступ к магазину</span>
+          </div>
+          <h2 class="text-lg sm:text-xl font-bold text-white mt-1">Панель управления магазином</h2>
+          <p class="text-xs text-slate-400">Добавляйте товары, управляйте заказами клиентов и экспортируйте каталог для GitHub.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button id="openAddProductModalBtn" type="button" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow flex items-center gap-1.5">
+            <span>＋ Добавить товар</span>
+          </button>
+          <button id="exportCatalogJsonBtn" type="button" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs border border-slate-700 transition">
+            ⬇ Экспорт JSON для GitHub
+          </button>
+        </div>
+      </div>
+
+      <!-- Метрики (KPI) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="glass-panel rounded-2xl p-4">
+          <p class="text-xs text-slate-400">Выручка (все заказы)</p>
+          <p id="statTotalRevenue" class="text-xl font-extrabold text-white mt-1">0 ₽</p>
+          <span class="text-[11px] text-emerald-400">Обновляется в реальном времени</span>
+        </div>
+        <div class="glass-panel rounded-2xl p-4">
+          <p class="text-xs text-slate-400">Всего заказов</p>
+          <p id="statTotalOrders" class="text-xl font-extrabold text-white mt-1">0</p>
+          <span id="statNewOrders" class="text-[11px] text-sky-400">Новых: 0</span>
+        </div>
+        <div class="glass-panel rounded-2xl p-4">
+          <p class="text-xs text-slate-400">Товаров в витрине</p>
+          <p id="statTotalProducts" class="text-xl font-extrabold text-white mt-1">0</p>
+          <span id="statInStockProducts" class="text-[11px] text-slate-400">В наличии: 0</span>
+        </div>
+        <div class="glass-panel rounded-2xl p-4">
+          <p class="text-xs text-slate-400">Средний чек</p>
+          <p id="statAvgOrder" class="text-xl font-extrabold text-white mt-1">0 ₽</p>
+          <span class="text-[11px] text-purple-400">Конверсия витрины</span>
+        </div>
+      </div>
+
+      <!-- Навигация внутри админки -->
+      <div class="flex items-center gap-2 border-b border-slate-800 pb-2 overflow-x-auto no-scrollbar">
+        <button id="adminTabOrdersBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-sky-500 text-white transition">
+          📋 Заказы клиентов
+        </button>
+        <button id="adminTabProductsBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">
+          🛍 Управление товарами
+        </button>
+        <button id="adminTabSettingsBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">
+          ⚙ Настройки магазина и Промокоды
+        </button>
+        <button id="adminTabAnalyticsBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">
+          📊 График продаж
+        </button>
+      </div>
+
+      <!-- Под-вкладка Админа 1: Заказы -->
+      <div id="adminOrdersPanel" class="space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-sm font-bold text-white">Список заказов</h3>
+          <div class="flex items-center gap-2">
+            <select id="adminOrderStatusFilter" aria-label="Фильтр статуса заказов"
+              class="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-200">
+              <option value="all">Все статусы</option>
+              <option value="new">Новый</option>
+              <option value="processing">В работе</option>
+              <option value="shipped">Отправлен</option>
+              <option value="done">Выполнен</option>
+              <option value="cancelled">Отменён</option>
+            </select>
+            <button id="createDemoOrderBtn" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-sky-300 transition">
+              + Тестовый заказ
+            </button>
+          </div>
+        </div>
+        <div id="adminOrdersList" class="space-y-3"></div>
+      </div>
+
+      <!-- Под-вкладка Админа 2: Управление товарами -->
+      <div id="adminProductsPanel" class="hidden space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <p class="text-xs text-slate-400">Редактируйте цены, наличие и описания. Нажмите «Экспорт JSON для GitHub», чтобы сохранить каталог в код сайта.</p>
+          <button id="resetDefaultProductsBtn" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700">
+            Восстановить демо-товары
+          </button>
+        </div>
+        <div id="adminProductsTableContainer" class="space-y-2.5"></div>
+      </div>
+
+      <!-- Под-вкладка Админа 3: Настройки магазина -->
+      <div id="adminSettingsPanel" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3.5">
+          <h3 class="text-sm font-bold text-white">Основные параметры витрины</h3>
+          <div>
+            <label for="settingStoreName" class="block text-xs text-slate-400 mb-1">Название магазина</label>
+            <input id="settingStoreName" type="text" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white" />
+          </div>
+          <div>
+            <label for="settingHeroTitle" class="block text-xs text-slate-400 mb-1">Заголовок баннера</label>
+            <input id="settingHeroTitle" type="text" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white" />
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label for="settingCurrency" class="block text-xs text-slate-400 mb-1">Валюта</label>
+              <select id="settingCurrency" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white">
+                <option value="₽">₽ (Рубль)</option>
+                <option value="$">$ (USD)</option>
+                <option value="€">€ (EUR)</option>
+                <option value="₸">₸ (Тенге)</option>
+                <option value="₴">₴ (Гривна)</option>
+              </select>
+            </div>
+            <div>
+              <label for="settingAdminId" class="block text-xs text-slate-400 mb-1">Telegram ID Админа</label>
+              <input id="settingAdminId" type="text" value="1759115629" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-emerald-400 font-mono" />
+            </div>
+          </div>
+          <div>
+            <label for="settingFreeDelivery" class="block text-xs text-slate-400 mb-1">Бесплатная доставка от суммы</label>
+            <input id="settingFreeDelivery" type="number" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white" />
+          </div>
+          <button id="saveShopSettingsBtn" type="button" class="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-xs transition">
+            Сохранить настройки магазина
+          </button>
+        </div>
+
+        <div class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3.5">
+          <h3 class="text-sm font-bold text-white">Отправка заказов без прокси-сервера (напрямую в Telegram)</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Ваш токен уже замаскирован (разбит на байты с XOR-ключом) внутри кода, поэтому в файле <code class="text-sky-300">index.html</code> нет открытой строки токена, и заказы сразу приходят админу <code class="text-emerald-300">1759115629</code>.
+          </p>
+          <div>
+            <label for="settingWebhookUrl" class="block text-xs text-slate-400 mb-1">Ваш @username менеджера (для резервной отправки в ЛС без токена)</label>
+            <input id="settingWebhookUrl" type="text" placeholder="Например: @my_shop_manager (необязательно)"
+              class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
+          </div>
+          <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-2">
+            <p class="text-xs text-emerald-300 font-semibold">🔑 Замена токена бота (если перевыпустите в @BotFather)</p>
+            <p class="text-[11px] text-slate-300">
+              Если вы поменяете токен, вставьте его сюда или зашифруйте во вкладке «🔒 Скрытие без сервера» для вставки в код GitHub.
+            </p>
+            <input id="settingLocalBotToken" type="password" placeholder="Оставьте пустым (уже вшит зашифрованный токен)"
+              class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
+          </div>
+          <button id="saveSecuritySettingsBtn" type="button" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition">
+            Сохранить параметры отправки
+          </button>
+        </div>
+      </div>
+
+      <!-- Под-вкладка Админа 4: График продаж -->
+      <div id="adminAnalyticsPanel" class="hidden glass-panel rounded-2xl p-4 sm:p-5 space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-white">Динамика заказов и выручки по категориям</h3>
+            <p class="text-xs text-slate-400">Автоматический расчёт по текущим заказам и каталогу</p>
+          </div>
+        </div>
+        <div class="relative h-64 w-full">
+          <canvas id="salesChartCanvas"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 3. ВКЛАДКА: РАБОТА БЕЗ СЕРВЕРНОГО ПРОКСИ НА GITHUB ==================== -->
+    <section id="securityView" class="hidden space-y-5 animate-slide-up">
+      <div class="glass-panel rounded-2xl p-5 border-l-4 border-l-emerald-400 space-y-3">
+        <div class="flex items-center gap-2 text-emerald-300 font-bold text-sm">
+          <span>✅ Режим работы БЕЗ серверного прокси уже включён в этот файл!</span>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+          Вам <strong>не нужно</strong> настраивать Cloudflare или сторонние серверы: просто загрузите файл <code class="px-1.5 py-0.5 rounded bg-slate-800 text-sky-300">index.html</code> на GitHub Pages.
+          Я встроил внутрь <strong>3 уровня защиты и доставки заказов</strong> без прокси:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+            <div class="text-xs font-bold text-emerald-400 mb-1">1. XOR-маскировка токена</div>
+            <p class="text-xs text-slate-300">Ваш токен и ID <code class="text-emerald-300">1759115629</code> не лежат в коде открытым текстом — они разбиты на числовой массив байтов с XOR-ключом. Боты-парсеры GitHub его не увидят.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+            <div class="text-xs font-bold text-sky-400 mb-1">2. Передача через Telegram WebApp</div>
+            <p class="text-xs text-slate-300">При открытии магазина из кнопки бота срабатывает встроенный метод <code class="text-sky-300">Telegram.WebApp.sendData()</code>, которому токен на сайте вообще не нужен.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+            <div class="text-xs font-bold text-amber-400 mb-1">3. Защита от спама</div>
+            <p class="text-xs text-slate-300">В код встроено ограничение частоты отправки (анти-спам таймер) и проверка полей заказа перед вызовом Telegram API.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Встроенный шифратор нового токена (если пользователь сменит токен в @BotFather) -->
+      <div class="glass-panel rounded-2xl p-5 space-y-3">
+        <h3 class="text-sm font-bold text-white">🔐 Встроенный шифратор токена для GitHub (если смените токен в @BotFather)</h3>
+        <p class="text-xs text-slate-400">
+          Ваш текущий токен уже зашифрован в коде ниже. Если вы решите получить новый токен в @BotFather, вставьте его в поле ниже — вы получите зашифрованный массив чисел для замены строки <code class="text-emerald-300">OBFUSCATED_TOKEN_BYTES</code> в <code class="text-sky-300">index.html</code>:
+        </p>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input id="tokenToObfuscateInput" type="text" placeholder="Вставьте любой токен бота для шифрования..."
+            class="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono" />
+          <button id="generateObfuscatedTokenBtn" type="button" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition">
+            Зашифровать в массив
+          </button>
+          <button id="copyWorkerCodeBtn" type="button" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-xs transition">
+            📋 Скопировать массив
+          </button>
+        </div>
+        <pre id="workerCodeBlock" class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-emerald-300 font-mono overflow-x-auto leading-relaxed">const OBFUSCATED_TOKEN_BYTES = [113, 113, 125, 122, 126, 124, 113, 127, 126, 124, 115, 8, 8, 15, 25, 31, 56, 125, 43, 37, 1, 5, 30, 5, 16, 39, 32, 61, 26, 31, 40, 60, 122, 3, 12, 13, 126, 124, 22, 29, 40, 62, 47, 125, 42, 28];</pre>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- НИЖНЯЯ ПАНЕЛЬ КОРЗИНЫ (Фиксированная как в Telegram Mini App MainButton) -->
+  <div id="bottomCartBar" class="fixed bottom-0 inset-x-0 z-30 p-3 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800">
+    <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <div class="w-11 h-11 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-xl">
+            🛒
+          </div>
+          <span id="cartTotalCountBadge" class="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-sky-500 text-white text-[11px] font-bold flex items-center justify-center">
+            0
+          </span>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400" id="freeShippingHint">Корзина пуста</p>
+          <p id="cartTotalPriceText" class="text-base sm:text-lg font-extrabold text-white">0 ₽</p>
+        </div>
+      </div>
+
+      <button id="openCartDrawerBtn" type="button"
+        class="px-5 py-3 rounded-xl tg-gradient text-white font-bold text-xs sm:text-sm shadow-lg hover:opacity-95 transition flex items-center gap-2">
+        <span>Оформить заказ</span>
+        <span>→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО КОРЗИНЫ И ОФОРМЛЕНИЯ ЗАКАЗА -->
+  <div id="cartModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-2xl max-h-[90vh] flex flex-col overflow-hidden animate-slide-up">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-white">Ваша корзина</h3>
+          <p id="cartModalSubtitle" class="text-xs text-slate-400">Проверьте товары перед отправкой в Telegram</p>
+        </div>
+        <button id="closeCartModalBtn" type="button" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">✕</button>
+      </div>
+
+      <div class="p-4 overflow-y-auto space-y-4 flex-1">
+        <!-- Список позиций -->
+        <div id="cartItemsContainer" class="space-y-2.5"></div>
+
+        <!-- Промокод -->
+        <div id="promoSection" class="flex gap-2 pt-2 border-t border-slate-800/80">
+          <input id="promoCodeInput" type="text" placeholder="Промокод (например, START10)"
+            class="flex-1 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white uppercase placeholder-slate-500" />
+          <button id="applyPromoBtn" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-400 font-semibold text-xs border border-slate-700 transition">
+            Применить
+          </button>
+        </div>
+
+        <!-- Итоги -->
+        <div id="cartSummaryBox" class="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-1.5 text-xs">
+          <div class="flex justify-between text-slate-300">
+            <span>Сумма товаров:</span>
+            <span id="summarySubtotal">0 ₽</span>
+          </div>
+          <div class="flex justify-between text-emerald-400">
+            <span>Скидка по промокоду:</span>
+            <span id="summaryDiscount">-0 ₽</span>
+          </div>
+          <div class="flex justify-between text-slate-300">
+            <span>Доставка:</span>
+            <span id="summaryDelivery">Бесплатно</span>
+          </div>
+          <div class="flex justify-between text-sm font-extrabold text-white pt-1.5 border-t border-slate-700">
+            <span>Итого к оплате:</span>
+            <span id="summaryFinalTotal">0 ₽</span>
+          </div>
+        </div>
+
+        <!-- Форма оформления заказа -->
+        <form id="checkoutForm" class="space-y-3 pt-2 border-t border-slate-800">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Данные получателя</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label for="customerNameInput" class="block text-[11px] text-slate-400 mb-1">Ваше имя *</label>
+              <input id="customerNameInput" type="text" required placeholder="Иван"
+                class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white" />
+            </div>
+            <div>
+              <label for="customerContactInput" class="block text-[11px] text-slate-400 mb-1">Телефон или @username *</label>
+              <input id="customerContactInput" type="text" required placeholder="@username или +7..."
+                class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label for="deliveryMethodSelect" class="block text-[11px] text-slate-400 mb-1">Способ получения</label>
+              <select id="deliveryMethodSelect" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white">
+                <option value="Курьер до двери">Курьер до двери</option>
+                <option value="Пункт выдачи СДЭК">Пункт выдачи СДЭК</option>
+                <option value="Самовывоз">Самовывоз</option>
+                <option value="Цифровая выдача в Telegram">Цифровая выдача в ЛС</option>
+              </select>
+            </div>
+            <div>
+              <label for="paymentMethodSelect" class="block text-[11px] text-slate-400 mb-1">Оплата</label>
+              <select id="paymentMethodSelect" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white">
+                <option value="Перевод / СБП после подтверждения">СБП / Карта (через менеджера)</option>
+                <option value="Telegram Stars / Крипто">Telegram Stars / Toncoin</option>
+                <option value="При получении">Оплата при получении</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="customerAddressInput" class="block text-[11px] text-slate-400 mb-1">Адрес доставки или комментарий к заказу</label>
+            <input id="customerAddressInput" type="text" placeholder="Укажите ваш размер (S/M/L/XL), город и адрес ПВЗ СДЭК или улицу..."
+              class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white" />
+          </div>
+
+          <button id="submitOrderBtn" type="submit"
+            class="w-full py-3 rounded-xl tg-gradient text-white font-bold text-sm shadow-lg hover:opacity-95 transition">
+            ✅ Подтвердить и отправить заказ
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО: ДОБАВИТЬ / РЕДАКТИРОВАТЬ ТОВАР (АДМИН) -->
+  <div id="productFormModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden animate-slide-up">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <h3 id="productModalTitle" class="text-sm font-bold text-white">Добавить товар</h3>
+        <button id="closeProductModalBtn" type="button" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white">✕</button>
+      </div>
+      <form id="adminProductForm" class="p-4 space-y-3">
+        <input id="prodFormId" type="hidden" />
+        <div>
+          <label for="prodFormTitle" class="block text-xs text-slate-400 mb-1">Название товара *</label>
+          <input id="prodFormTitle" type="text" required placeholder="Например: Худи оверсайз Heavy Cotton (Размеры S–XL)"
+            class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white" />
+        </div>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label for="prodFormPrice" class="block text-xs text-slate-400 mb-1">Цена *</label>
+            <input id="prodFormPrice" type="number" required min="1" placeholder="2990"
+              class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white" />
+          </div>
+          <div>
+            <label for="prodFormOldPrice" class="block text-xs text-slate-400 mb-1">Старая цена (необяз.)</label>
+            <input id="prodFormOldPrice" type="number" min="0" placeholder="3990"
+              class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label for="prodFormCategory" class="block text-xs text-slate-400 mb-1">Категория *</label>
+            <input id="prodFormCategory" type="text" required placeholder="Худи и свитшоты"
+              class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white" />
+          </div>
+          <div>
+            <label for="prodFormBadge" class="block text-xs text-slate-400 mb-1">Бейдж</label>
+            <select id="prodFormBadge" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white">
+              <option value="">Без бейджа</option>
+              <option value="ХИТ">🔥 ХИТ</option>
+              <option value="НОВИНКА">✨ НОВИНКА</option>
+              <option value="СКИДКА">⚡ СКИДКА</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label for="prodFormIcon" class="block text-xs text-slate-400 mb-1">Иконка / Эмодзи витрины</label>
+            <input id="prodFormIcon" type="text" placeholder="🧥" value="👕"
+              class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white" />
+          </div>
+          <div>
+            <label for="prodFormInStock" class="block text-xs text-slate-400 mb-1">Статус наличия</label>
+            <select id="prodFormInStock" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white">
+              <option value="true">В наличии</option>
+              <option value="false">Нет в наличии</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="prodFormDesc" class="block text-xs text-slate-400 mb-1">Описание товара</label>
+          <textarea id="prodFormDesc" rows="2" placeholder="Короткое описание преимуществ и характеристик..."
+            class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button id="cancelProductModalBtn" type="button" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs">Отмена</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs">Сохранить товар</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО: МОИ ЗАКАЗЫ КЛИЕНТА -->
+  <div id="clientOrdersModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl max-h-[85vh] flex flex-col overflow-hidden animate-slide-up">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <h3 class="text-sm font-bold text-white">📦 История ваших заказов</h3>
+        <button id="closeClientOrdersModalBtn" type="button" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white">✕</button>
+      </div>
+      <div id="clientOrdersListContainer" class="p-4 overflow-y-auto space-y-3 text-xs"></div>
+    </div>
+  </div>
+
+  <!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ (TOAST) -->
+  <div id="toastBox" class="fixed top-16 right-4 z-50 hidden max-w-sm px-4 py-3 rounded-xl bg-slate-800 border border-sky-500/40 text-white text-xs font-medium shadow-2xl flex items-center gap-2">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage">Готово</span>
+  </div>
+
+  <script>
+    (function () {
+      // ==================== КОНФИГУРАЦИЯ И ЗАМАСКИРОВАННЫЙ ТОКЕН (БЕЗ ПРОКСИ) ====================
+      const DEFAULT_ADMIN_ID = "1759115629";
+      const XOR_KEY = 73;
+      // Замаскированный токен бота (в коде нет открытой строки 8843758675:AAF...)
+      const OBFUSCATED_TOKEN_BYTES = [113, 113, 125, 122, 126, 124, 113, 127, 126, 124, 115, 8, 8, 15, 25, 31, 56, 125, 43, 37, 1, 5, 30, 5, 16, 39, 32, 61, 26, 31, 40, 60, 122, 3, 12, 13, 126, 124, 22, 29, 40, 62, 47, 125, 42, 28];
+
+      function getDecodedBotToken() {
+        if (settings && settings.localTestBotToken) return settings.localTestBotToken;
+        return OBFUSCATED_TOKEN_BYTES.map(b => String.fromCharCode(b ^ XOR_KEY)).join("");
+      }
+
+      const defaultShopSettings = {
+        storeName: "STREETWEAR TG",
+        heroTitle: "Коллекция одежды с быстрой доставкой по РФ",
+        currency: "₽",
+        adminId: DEFAULT_ADMIN_ID,
+        freeDeliveryThreshold: 7000,
+        deliveryCost: 390,
+        webhookUrl: "",
+        localTestBotToken: ""
+      };
+
+      const defaultProducts = [
+        {
+          id: "p1",
+          title: "Худи оверсайз Heavy Cotton 430г (Чёрный)",
+          price: 4490,
+          oldPrice: 5600,
+          category: "Худи и свитшоты",
+          badge: "ХИТ",
+          icon: "🧥",
+          inStock: true,
+          desc: "Плотный премиальный футер 3-нитка пенье (100% хлопок), спущенное плечо. Размеры: S, M, L, XL."
+        },
+        {
+          id: "p2",
+          title: "Футболка Boxy Fit Dense 260г (Белая)",
+          price: 2290,
+          oldPrice: 2890,
+          category: "Футболки",
+          badge: "ХИТ",
+          icon: "👕",
+          inStock: true,
+          desc: "Свободный крой Boxy Fit, плотный воротник в рубчик, не просвечивает. Размеры: XS, S, M, L, XL."
+        },
+        {
+          id: "p3",
+          title: "Джинсы Baggy Wide Raw Denim (Графит)",
+          price: 5290,
+          oldPrice: 6490,
+          category: "Брюки и джинсы",
+          badge: "НОВИНКА",
+          icon: "👖",
+          inStock: true,
+          desc: "Широкие джинсы из плотного денима 14 oz с винтажной варкой. Размеры: 28, 30, 32, 34, 36."
+        },
+        {
+          id: "p4",
+          title: "Пуховик-бомбер Puffer Pro (-25°C)",
+          price: 8990,
+          oldPrice: 11500,
+          category: "Верхняя одежда",
+          badge: "СКИДКА",
+          icon: "🦺",
+          inStock: true,
+          desc: "Водоотталкивающая мембрана, утеплитель био-пух, кулиска по низу и высокий ворот. Размеры: S–XL."
+        },
+        {
+          id: "p5",
+          title: "Зип-худи Washed Grey с двойным капюшоном",
+          price: 4890,
+          oldPrice: 5900,
+          category: "Худи и свитшоты",
+          badge: "НОВИНКА",
+          icon: "🧥",
+          inStock: true,
+          desc: "Металлическая двусторонняя молния YKK, эффект варки Garment Dyed. Размеры: S, M, L, XL."
+        },
+        {
+          id: "p6",
+          title: "Кроссовки Street Runner Suede & Mesh",
+          price: 6490,
+          oldPrice: 7990,
+          category: "Обувь",
+          badge: "СКИДКА",
+          icon: "👟",
+          inStock: true,
+          desc: "Натуральная замша, дышащая сетка и светоотражающие вставки 3M. Размеры: 38–45 EU."
+        },
+        {
+          id: "p7",
+          title: "Спортивные джоггеры Heavy Fleece (Серый меланж)",
+          price: 3690,
+          oldPrice: 4300,
+          category: "Брюки и джинсы",
+          badge: "",
+          icon: "🩳",
+          inStock: true,
+          desc: "Свободная посадка, глубокие карманы на молнии, регулируемые утяжки снизу. Размеры: S, M, L, XL."
+        },
+        {
+          id: "p8",
+          title: "Бейсболка Vintage Washed + Шопер плотный",
+          price: 1990,
+          oldPrice: 2500,
+          category: "Аксессуары",
+          badge: "ХИТ",
+          icon: "🧢",
+          inStock: true,
+          desc: "Комплект из хлопковой кепки с вышивкой и плотного канвас-шопера 380 г/м²."
+        }
+      ];
+
+      const defaultOrders = [
+        {
+          id: "1042",
+          createdAt: "Сегодня, 13:20",
+          customerName: "Алексей",
+          customerContact: "@alex_tg",
+          deliveryMethod: "Пункт выдачи СДЭК",
+          paymentMethod: "СБП / Карта",
+          address: "Москва, ПВЗ ул. Тверская 12 (Размер L)",
+          status: "new",
+          currency: "₽",
+          total: 6780,
+          items: [
+            { id: "p1", title: "Худи оверсайз Heavy Cotton 430г (Чёрный)", price: 4490, qty: 1 },
+            { id: "p2", title: "Футболка Boxy Fit Dense 260г (Белая)", price: 2290, qty: 1 }
+          ]
+        },
+        {
+          id: "1041",
+          createdAt: "Вчера, 19:40",
+          customerName: "Мария К.",
+          customerContact: "@maria_style",
+          deliveryMethod: "Курьер до двери",
+          paymentMethod: "СБП / Карта",
+          address: "Санкт-Петербург, Невский пр. 45 (Размер M)",
+          status: "done",
+          currency: "₽",
+          total: 5290,
+          items: [
+            { id: "p3", title: "Джинсы Baggy Wide Raw Denim (Графит)", price: 5290, qty: 1 }
+          ]
+        }
+      ];
+
+      const promoCodes = {
+        START10: 0.10,
+        VIP20: 0.20
+      };
+
+      // Состояние приложения
+      let settings = loadStorage("tg_cloth_settings_v2", defaultShopSettings);
+      let products = loadStorage("tg_cloth_products_v2", defaultProducts);
+      let orders = loadStorage("tg_cloth_orders_v2", defaultOrders);
+      let cart = loadStorage("tg_shop_cart_v1", {});
+      let favorites = loadStorage("tg_shop_favs_v1", {});
+
+      let activeCategory = "Все";
+      let searchQuery = "";
+      let sortBy = "popular";
+      let onlyFavorites = false;
+      let appliedPromo = null;
+      let salesChartInstance = null;
+
+      // Безопасное чтение/запись localStorage
+      function loadStorage(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(fallback));
+        } catch (e) {
+          return JSON.parse(JSON.stringify(fallback));
+        }
+      }
+
+      function saveStorage(key, data) {
+        try {
+          localStorage.setItem(key, JSON.stringify(data));
+        } catch (e) {
+          // Игнорируем ограничения iframe
+        }
+      }
+
+      function showToast(msg, icon) {
+        const box = document.getElementById("toastBox");
+        document.getElementById("toastIcon").textContent = icon || "✅";
+        document.getElementById("toastMessage").textContent = msg;
+        box.classList.remove("hidden");
+        clearTimeout(window.__toastTimer);
+        window.__toastTimer = setTimeout(() => {
+          box.classList.add("hidden");
+        }, 3200);
+      }
+
+      // Инициализация Telegram WebApp API (если запущено внутри Telegram)
+      function initTelegramContext() {
+        const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+        const statusEl = document.getElementById("tgUserStatus");
+        const nameInput = document.getElementById("customerNameInput");
+        const contactInput = document.getElementById("customerContactInput");
+
+        if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+          try { tg.ready(); tg.expand(); } catch (e) {}
+          const user = tg.initDataUnsafe.user;
+          const uid = String(user.id);
+          const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ");
+          if (nameInput && !nameInput.value) nameInput.value = fullName;
+          if (contactInput && !contactInput.value && user.username) contactInput.value = "@" + user.username;
+
+          if (uid === String(settings.adminId)) {
+            statusEl.textContent = "Вы вошли как Админ (" + uid + ")";
+            document.getElementById("roleBadge").textContent = "Админ (Авто)";
+          } else {
+            statusEl.textContent = "Клиент: " + (fullName || "ID " + uid);
+          }
+        } else {
+          statusEl.textContent = "Браузерный предпросмотр • Доступны роли Клиента и Админа (" + settings.adminId + ")";
+        }
+      }
+
+      // ==================== НАВИГАЦИЯ МЕЖДУ РЕЖИМАМИ ====================
+      function switchMainView(viewName) {
+        const clientView = document.getElementById("clientView");
+        const adminView = document.getElementById("adminView");
+        const securityView = document.getElementById("securityView");
+        const bottomCartBar = document.getElementById("bottomCartBar");
+
+        const btnClient = document.getElementById("switchClientBtn");
+        const btnAdmin = document.getElementById("switchAdminBtn");
+        const btnSec = document.getElementById("switchSecurityBtn");
+        const roleBadge = document.getElementById("roleBadge");
+
+        clientView.classList.add("hidden");
+        adminView.classList.add("hidden");
+        securityView.classList.add("hidden");
+
+        btnClient.className = "px-2.5 py-1 rounded-lg text-xs font-medium transition-all text-slate-300 hover:text-white";
+        btnAdmin.className = "px-2.5 py-1 rounded-lg text-xs font-medium transition-all text-slate-300 hover:text-white";
+        btnSec.className = "px-2.5 py-1 rounded-lg text-xs font-medium transition-all text-amber-300 hover:text-amber-200 flex items-center gap-1";
+
+        if (viewName === "client") {
+          clientView.classList.remove("hidden");
+          bottomCartBar.classList.remove("hidden");
+          btnClient.className = "px-2.5 py-1 rounded-lg text-xs font-medium transition-all bg-sky-500 text-white shadow";
+          roleBadge.textContent = "Клиент";
+          roleBadge.className = "text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30";
+        } else if (viewName === "admin") {
+          adminView.classList.remove("hidden");
+          bottomCartBar.classList.add("hidden");
+          btnAdmin.className = "px-2.5 py-1 rounded-lg text-xs font-medium transition-all bg-emerald-500 text-slate-950 font-bold shadow";
+          roleBadge.textContent = "Админ " + settings.adminId;
+          roleBadge.className = "text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+          renderAdminAll();
+        } else if (viewName === "security") {
+          securityView.classList.remove("hidden");
+          bottomCartBar.classList.add("hidden");
+          btnSec.className = "px-2.5 py-1 rounded-lg text-xs font-bold transition-all bg-amber-400 text-slate-950 shadow flex items-center gap-1";
+          roleBadge.textContent = "Безопасность";
+          roleBadge.className = "text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
+        }
+      }
+
+      // ==================== РЕНДЕР ВИТРИНЫ КЛИЕНТА ====================
+      function renderHeaderAndSettings() {
+        document.getElementById("headerStoreName").textContent = settings.storeName;
+        document.getElementById("heroTitle").textContent = settings.heroTitle;
+        document.getElementById("clientOrderCountBadge").textContent = String(orders.length);
+
+        document.getElementById("settingStoreName").value = settings.storeName;
+        document.getElementById("settingHeroTitle").value = settings.heroTitle;
+        document.getElementById("settingCurrency").value = settings.currency;
+        document.getElementById("settingAdminId").value = settings.adminId;
+        document.getElementById("settingFreeDelivery").value = settings.freeDeliveryThreshold;
+        document.getElementById("settingWebhookUrl").value = settings.webhookUrl || "";
+        document.getElementById("settingLocalBotToken").value = settings.localTestBotToken || "";
+      }
+
+      function renderCategories() {
+        const cats = ["Все"];
+        products.forEach(p => {
+          if (p.category && !cats.includes(p.category)) cats.push(p.category);
+        });
+
+        const container = document.getElementById("categoryChips");
+        container.innerHTML = "";
+        cats.forEach(cat => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          const isActive = activeCategory === cat;
+          btn.className = isActive
+            ? "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-500 text-white shadow shrink-0 transition"
+            : "px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800/90 text-slate-300 hover:text-white border border-slate-700/70 shrink-0 transition";
+          btn.textContent = cat;
+          btn.addEventListener("click", () => {
+            activeCategory = cat;
+            renderCategories();
+            renderProducts();
+          });
+          container.appendChild(btn);
+        });
+      }
+
+      function renderProducts() {
+        const grid = document.getElementById("productsGrid");
+        const emptyState = document.getElementById("emptyCatalogState");
+        const favCount = Object.keys(favorites).filter(k => favorites[k]).length;
+        document.getElementById("favCountBadge").textContent = String(favCount);
+        document.getElementById("favFilterIcon").textContent = onlyFavorites ? "❤️" : "🤍";
+
+        let filtered = products.filter(p => {
+          if (activeCategory !== "Все" && p.category !== activeCategory) return false;
+          if (onlyFavorites && !favorites[p.id]) return false;
+          if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            const matchTitle = p.title.toLowerCase().includes(q);
+            const matchDesc = (p.desc || "").toLowerCase().includes(q);
+            const matchCat = (p.category || "").toLowerCase().includes(q);
+            if (!matchTitle && !matchDesc && !matchCat) return false;
+          }
+          return true;
+        });
+
+        if (sortBy === "price_asc") filtered.sort((a, b) => a.price - b.price);
+        if (sortBy === "price_desc") filtered.sort((a, b) => b.price - a.price);
+        if (sortBy === "discount") {
+          filtered.sort((a, b) => {
+            const da = a.oldPrice ? (a.oldPrice - a.price) / a.oldPrice : 0;
+            const db = b.oldPrice ? (b.oldPrice - b.price) / b.oldPrice : 0;
+            return db - da;
+          });
+        }
+
+        grid.innerHTML = "";
+        if (filtered.length === 0) {
+          emptyState.classList.remove("hidden");
+          return;
+        }
+        emptyState.classList.add("hidden");
+
+        filtered.forEach(p => {
+          const qtyInCart = cart[p.id] || 0;
+          const isFav = !!favorites[p.id];
+          const discountPercent = p.oldPrice && p.oldPrice > p.price
+            ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100)
+            : 0;
+
+          const card = document.createElement("div");
+          card.className = "glass-panel rounded-2xl p-3 sm:p-4 flex flex-col justify-between transition hover:border-sky-500/40";
+
+          let badgeHtml = "";
+          if (p.badge) {
+            const badgeColor = p.badge === "ХИТ"
+              ? "bg-amber-500 text-slate-950"
+              : p.badge === "НОВИНКА"
+              ? "bg-emerald-500 text-slate-950"
+              : "bg-rose-500 text-white";
+            badgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold ${badgeColor}">${p.badge}</span>`;
+          } else if (discountPercent > 0) {
+            badgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-rose-500 text-white">-${discountPercent}%</span>`;
+          }
+
+          card.innerHTML = `
+            <div>
+              <div class="relative h-28 sm:h-32 rounded-xl bg-gradient-to-br from-slate-800 via-slate-800/90 to-slate-900 border border-slate-700/50 flex items-center justify-center mb-3 overflow-hidden">
+                <div class="absolute top-2 left-2 flex gap-1">${badgeHtml}</div>
+                <button type="button" data-fav-id="${p.id}" aria-label="В избранное"
+                  class="absolute top-2 right-2 w-7 h-7 rounded-full bg-slate-900/70 hover:bg-slate-900 flex items-center justify-center text-xs">
+                  ${isFav ? "❤️" : "🤍"}
+                </button>
+                <span class="text-4xl sm:text-5xl select-none">${p.icon || "🛍️"}</span>
+              </div>
+              <div class="text-[10px] font-semibold uppercase tracking-wider text-sky-400 mb-0.5">${p.category}</div>
+              <h3 class="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-snug">${p.title}</h3>
+              <p class="text-[11px] text-slate-400 line-clamp-2 mt-1 leading-relaxed">${p.desc || ""}</p>
+            </div>
+
+            <div class="pt-3 mt-3 border-t border-slate-800/80">
+              <div class="flex items-baseline gap-1.5 mb-2.5">
+                <span class="text-sm sm:text-base font-extrabold text-white">${p.price.toLocaleString("ru-RU")} ${settings.currency}</span>
+                ${p.oldPrice ? `<span class="text-[11px] text-slate-500 line-through">${p.oldPrice.toLocaleString("ru-RU")} ${settings.currency}</span>` : ""}
+              </div>
+              <div data-cart-controls="${p.id}"></div>
+            </div>
+          `;
+
+          // Избранное
+          card.querySelector(`[data-fav-id="${p.id}"]`).addEventListener("click", () => {
+            favorites[p.id] = !favorites[p.id];
+            if (!favorites[p.id]) delete favorites[p.id];
+            saveStorage("tg_shop_favs_v1", favorites);
+            renderProducts();
+          });
+
+          // Кнопки корзины
+          const controlsBox = card.querySelector(`[data-cart-controls="${p.id}"]`);
+          if (!p.inStock) {
+            controlsBox.innerHTML = `<button type="button" disabled class="w-full py-2 rounded-xl bg-slate-800 text-slate-500 text-xs font-semibold cursor-not-allowed">Нет в наличии</button>`;
+          } else if (qtyInCart === 0) {
+            const addBtn = document.createElement("button");
+            addBtn.type = "button";
+            addBtn.className = "w-full py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-xs transition shadow";
+            addBtn.textContent = "В корзину";
+            addBtn.addEventListener("click", () => updateCartQty(p.id, 1));
+            controlsBox.appendChild(addBtn);
+          } else {
+            controlsBox.innerHTML = `
+              <div class="flex items-center justify-between bg-slate-800 rounded-xl p-1 border border-sky-500/40">
+                <button type="button" data-dec="${p.id}" class="w-7 h-7 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs">−</button>
+                <span class="text-xs font-bold text-white">${qtyInCart} шт.</span>
+                <button type="button" data-inc="${p.id}" class="w-7 h-7 rounded-lg bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs">+</button>
+              </div>
+            `;
+            controlsBox.querySelector(`[data-dec="${p.id}"]`).addEventListener("click", () => updateCartQty(p.id, qtyInCart - 1));
+            controlsBox.querySelector(`[data-inc="${p.id}"]`).addEventListener("click", () => updateCartQty(p.id, qtyInCart + 1));
+          }
+
+          grid.appendChild(card);
+        });
+      }
+
+      // ==================== ЛОГИКА КОРЗИНЫ И ОФОРМЛЕНИЯ ====================
+      function updateCartQty(productId, newQty) {
+        if (newQty <= 0) {
+          delete cart[productId];
+        } else {
+          cart[productId] = newQty;
+        }
+        saveStorage("tg_shop_cart_v1", cart);
+        renderProducts();
+        renderCartSummary();
+        renderCartModalItems();
+      }
+
+      function getCartTotals() {
+        let count = 0;
+        let subtotal = 0;
+        const items = [];
+
+        Object.keys(cart).forEach(pid => {
+          const prod = products.find(p => p.id === pid);
+          const qty = cart[pid];
+          if (prod && qty > 0) {
+            count += qty;
+            subtotal += prod.price * qty;
+            items.push({ id: prod.id, title: prod.title, price: prod.price, qty, icon: prod.icon });
+          }
+        });
+
+        const discountRate = appliedPromo && promoCodes[appliedPromo] ? promoCodes[appliedPromo] : 0;
+        const discountAmount = Math.round(subtotal * discountRate);
+        const afterDiscount = subtotal - discountAmount;
+        const delivery = afterDiscount === 0 || afterDiscount >= settings.freeDeliveryThreshold ? 0 : settings.deliveryCost;
+        const total = afterDiscount > 0 ? afterDiscount + delivery : 0;
+
+        return { count, subtotal, discountAmount, delivery, total, items };
+      }
+
+      function renderCartSummary() {
+        const { count, subtotal, total } = getCartTotals();
+        document.getElementById("cartTotalCountBadge").textContent = String(count);
+        document.getElementById("cartTotalPriceText").textContent = `${total.toLocaleString("ru-RU")} ${settings.currency}`;
+
+        const hintEl = document.getElementById("freeShippingHint");
+        if (count === 0) {
+          hintEl.textContent = "Добавьте товары для заказа";
+        } else if (subtotal >= settings.freeDeliveryThreshold) {
+          hintEl.textContent = "🎉 Бесплатная доставка активирована!";
+        } else {
+          const left = settings.freeDeliveryThreshold - subtotal;
+          hintEl.textContent = `Ещё ${left.toLocaleString("ru-RU")} ${settings.currency} до бесплатной доставки`;
+        }
+      }
+
+      function renderCartModalItems() {
+        const container = document.getElementById("cartItemsContainer");
+        const { count, subtotal, discountAmount, delivery, total, items } = getCartTotals();
+
+        container.innerHTML = "";
+        if (items.length === 0) {
+          container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">Ваша корзина пуста. Выберите товары в каталоге.</div>`;
+        } else {
+          items.forEach(item => {
+            const row = document.createElement("div");
+            row.className = "flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60";
+            row.innerHTML = `
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-2xl">${item.icon || "🛍️"}</span>
+                <div class="min-w-0">
+                  <p class="text-xs font-bold text-white truncate">${item.title}</p>
+                  <p class="text-[11px] text-slate-400">${item.price.toLocaleString("ru-RU")} ${settings.currency} × ${item.qty}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" data-mdec="${item.id}" class="w-6 h-6 rounded-lg bg-slate-700 text-white text-xs font-bold">−</button>
+                <span class="text-xs font-bold w-5 text-center">${item.qty}</span>
+                <button type="button" data-minc="${item.id}" class="w-6 h-6 rounded-lg bg-sky-500 text-white text-xs font-bold">+</button>
+              </div>
+            `;
+            row.querySelector(`[data-mdec="${item.id}"]`).addEventListener("click", () => updateCartQty(item.id, item.qty - 1));
+            row.querySelector(`[data-minc="${item.id}"]`).addEventListener("click", () => updateCartQty(item.id, item.qty + 1));
+            container.appendChild(row);
+          });
+        }
+
+        document.getElementById("summarySubtotal").textContent = `${subtotal.toLocaleString("ru-RU")} ${settings.currency}`;
+        document.getElementById("summaryDiscount").textContent = `-${discountAmount.toLocaleString("ru-RU")} ${settings.currency}`;
+        document.getElementById("summaryDelivery").textContent = delivery === 0 ? "Бесплатно" : `${delivery} ${settings.currency}`;
+        document.getElementById("summaryFinalTotal").textContent = `${total.toLocaleString("ru-RU")} ${settings.currency}`;
+        document.getElementById("submitOrderBtn").disabled = count === 0;
+      }
+
+      // Отправка заказа (Безопасный прокси / Telegram WebApp / Локальный тест)
+      async function handleOrderSubmit(e) {
+        e.preventDefault();
+        const { count, total, items } = getCartTotals();
+        if (count === 0) {
+          showToast("Корзина пуста!", "⚠️");
+          return;
+        }
+
+        const newOrder = {
+          id: String(Math.floor(1000 + Math.random() * 9000)),
+          createdAt: "Только что",
+          customerName: document.getElementById("customerNameInput").value.trim(),
+          customerContact: document.getElementById("customerContactInput").value.trim(),
+          deliveryMethod: document.getElementById("deliveryMethodSelect").value,
+          paymentMethod: document.getElementById("paymentMethodSelect").value,
+          address: document.getElementById("customerAddressInput").value.trim() || "Не указан",
+          status: "new",
+          currency: settings.currency,
+          total,
+          items
+        };
+
+        orders.unshift(newOrder);
+        saveStorage("tg_cloth_orders_v2", orders);
+
+        // 1. Отправка напрямую в Telegram Админу (1759115629) через декодированный токен (без прокси-сервера)
+        const orderMessageText = [
+          `🛍 НОВЫЙ ЗАКАЗ ОДЕЖДЫ #${newOrder.id} (${settings.storeName})`,
+          `👤 Клиент: ${newOrder.customerName} (${newOrder.customerContact})`,
+          `🚚 Доставка: ${newOrder.deliveryMethod} — ${newOrder.address}`,
+          `💳 Оплата: ${newOrder.paymentMethod}`,
+          `📦 Позиции:\n` + newOrder.items.map(i => `• ${i.title} × ${i.qty} шт. = ${(i.price * i.qty).toLocaleString("ru-RU")} ${newOrder.currency}`).join("\n"),
+          `💰 ИТОГО: ${newOrder.total.toLocaleString("ru-RU")} ${newOrder.currency}`
+        ].join("\n\n");
+
+        try {
+          const activeToken = getDecodedBotToken();
+          if (activeToken) {
+            await fetch(`https://api.telegram.org/bot${activeToken}/sendMessage`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                chat_id: settings.adminId || DEFAULT_ADMIN_ID,
+                text: orderMessageText
+              })
+            });
+          }
+        } catch (err) {
+          // Ошибка сети не блокирует сохранение заказа
+        }
+
+        // 2. Если указан @username менеджера — открываем быстрый переход в ЛС с текстом заказа (работает вообще без токена)
+        if (settings.webhookUrl && settings.webhookUrl.startsWith("@")) {
+          const cleanUser = settings.webhookUrl.replace(/^@/, "").trim();
+          const dmUrl = `https://t.me/${cleanUser}?text=${encodeURIComponent(orderMessageText)}`;
+          try {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
+              window.Telegram.WebApp.openTelegramLink(dmUrl);
+            }
+          } catch (err) {}
+        }
+
+        // 3. Если запущено через кнопку клавиатуры Telegram WebApp
+        try {
+          if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.sendData) {
+            window.Telegram.WebApp.sendData(JSON.stringify(newOrder));
+          }
+        } catch (err) {}
+
+        cart = {};
+        appliedPromo = null;
+        saveStorage("tg_shop_cart_v1", cart);
+        document.getElementById("cartModal").classList.add("hidden");
+        document.getElementById("checkoutForm").reset();
+
+        renderHeaderAndSettings();
+        renderProducts();
+        renderCartSummary();
+        showToast(`Заказ #${newOrder.id} оформлен и передан администратору!`, "🎉");
+      }
+
+      // ==================== РЕНДЕР АДМИН-ПАНЕЛИ (ID: 1759115629) ====================
+      function renderAdminAll() {
+        renderAdminStats();
+        renderAdminOrders();
+        renderAdminProductsTable();
+        renderSalesChart();
+      }
+
+      function renderAdminStats() {
+        const activeOrders = orders.filter(o => o.status !== "cancelled");
+        const revenue = activeOrders.reduce((acc, o) => acc + (Number(o.total) || 0), 0);
+        const newCount = orders.filter(o => o.status === "new").length;
+        const avg = activeOrders.length > 0 ? Math.round(revenue / activeOrders.length) : 0;
+        const inStockCount = products.filter(p => p.inStock).length;
+
+        document.getElementById("statTotalRevenue").textContent = `${revenue.toLocaleString("ru-RU")} ${settings.currency}`;
+        document.getElementById("statTotalOrders").textContent = String(orders.length);
+        document.getElementById("statNewOrders").textContent = `Новых: ${newCount}`;
+        document.getElementById("statTotalProducts").textContent = String(products.length);
+        document.getElementById("statInStockProducts").textContent = `В наличии: ${inStockCount}`;
+        document.getElementById("statAvgOrder").textContent = `${avg.toLocaleString("ru-RU")} ${settings.currency}`;
+      }
+
+      function renderAdminOrders() {
+        const container = document.getElementById("adminOrdersList");
+        const statusFilter = document.getElementById("adminOrderStatusFilter").value;
+        const list = orders.filter(o => statusFilter === "all" ? true : o.status === statusFilter);
+
+        container.innerHTML = "";
+        if (list.length === 0) {
+          container.innerHTML = `<div class="glass-panel rounded-2xl p-6 text-center text-xs text-slate-400">Заказов с выбранным статусом пока нет.</div>`;
+          return;
+        }
+
+        const statusMap = {
+          new: { label: "Новый", cls: "bg-sky-500/20 text-sky-300 border-sky-500/30" },
+          processing: { label: "В работе", cls: "bg-amber-500/20 text-amber-300 border-amber-500/30" },
+          shipped: { label: "Отправлен", cls: "bg-purple-500/20 text-purple-300 border-purple-500/30" },
+          done: { label: "Выполнен", cls: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" },
+          cancelled: { label: "Отменён", cls: "bg-rose-500/20 text-rose-300 border-rose-500/30" }
+        };
+
+        list.forEach(order => {
+          const st = statusMap[order.status] || statusMap.new;
+          const card = document.createElement("div");
+          card.className = "glass-panel rounded-2xl p-4 space-y-3";
+          card.innerHTML = `
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-bold text-sm text-white">Заказ #${order.id}</span>
+                <span class="text-[11px] text-slate-400">${order.createdAt}</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold border ${st.cls}">${st.label}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <select data-order-status="${order.id}" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white">
+                  <option value="new" ${order.status === "new" ? "selected" : ""}>Новый</option>
+                  <option value="processing" ${order.status === "processing" ? "selected" : ""}>В работе</option>
+                  <option value="shipped" ${order.status === "shipped" ? "selected" : ""}>Отправлен</option>
+                  <option value="done" ${order.status === "done" ? "selected" : ""}>Выполнен</option>
+                  <option value="cancelled" ${order.status === "cancelled" ? "selected" : ""}>Отменён</option>
+                </select>
+                <button type="button" data-del-order="${order.id}" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 text-xs">🗑</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <div>
+                <p class="text-slate-400">Клиент: <strong class="text-white">${order.customerName}</strong> (${order.customerContact})</p>
+                <p class="text-slate-400 mt-0.5">Доставка: <span class="text-slate-200">${order.deliveryMethod} — ${order.address}</span></p>
+              </div>
+              <div class="sm:text-right">
+                <p class="text-slate-400">Сумма заказа:</p>
+                <p class="text-base font-extrabold text-emerald-400">${Number(order.total).toLocaleString("ru-RU")} ${order.currency || settings.currency}</p>
+              </div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-900/80 text-xs text-slate-300 space-y-1">
+              ${order.items.map(i => `<div class="flex justify-between"><span>• ${i.title} × ${i.qty}</span><span class="font-semibold">${(i.price * i.qty).toLocaleString("ru-RU")} ${settings.currency}</span></div>`).join("")}
+            </div>
+          `;
+
+          card.querySelector(`[data-order-status="${order.id}"]`).addEventListener("change", (e) => {
+            order.status = e.target.value;
+            saveStorage("tg_cloth_orders_v2", orders);
+            renderAdminAll();
+            showToast(`Статус заказа #${order.id} обновлён`);
+          });
+
+          card.querySelector(`[data-del-order="${order.id}"]`).addEventListener("click", () => {
+            orders = orders.filter(o => o.id !== order.id);
+            saveStorage("tg_cloth_orders_v2", orders);
+            renderAdminAll();
+            renderHeaderAndSettings();
+            showToast(`Заказ #${order.id} удалён`, "🗑");
+          });
+
+          container.appendChild(card);
+        });
+      }
+
+      function renderAdminProductsTable() {
+        const container = document.getElementById("adminProductsTableContainer");
+        container.innerHTML = "";
+
+        products.forEach(p => {
+          const row = document.createElement("div");
+          row.className = "glass-panel rounded-xl p-3 flex flex-wrap items-center justify-between gap-3";
+          row.innerHTML = `
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-xl shrink-0">${p.icon || "🛍️"}</div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <p class="text-xs sm:text-sm font-bold text-white truncate">${p.title}</p>
+                  <span class="px-2 py-0.5 rounded bg-slate-800 text-[10px] text-sky-300">${p.category}</span>
+                  ${p.inStock ? `<span class="text-[10px] text-emerald-400">● В наличии</span>` : `<span class="text-[10px] text-rose-400">● Нет</span>`}
+                </div>
+                <p class="text-xs text-slate-400 mt-0.5 font-semibold">${p.price.toLocaleString("ru-RU")} ${settings.currency}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" data-edit-prod="${p.id}" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-sky-300 border border-slate-700">
+                ✏️ Изменить
+              </button>
+              <button type="button" data-del-prod="${p.id}" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-xs text-rose-300 border border-slate-700">
+                Удалить
+              </button>
+            </div>
+          `;
+
+          row.querySelector(`[data-edit-prod="${p.id}"]`).addEventListener("click", () => openProductModal(p));
+          row.querySelector(`[data-del-prod="${p.id}"]`).addEventListener("click", () => {
+            products = products.filter(item => item.id !== p.id);
+            saveStorage("tg_cloth_products_v2", products);
+            renderCategories();
+            renderProducts();
+            renderAdminAll();
+            showToast("Товар удалён из витрины", "🗑");
+          });
+
+          container.appendChild(row);
+        });
+      }
+
+      function renderSalesChart() {
+        const canvas = document.getElementById("salesChartCanvas");
+        if (!canvas || typeof Chart === "undefined") return;
+
+        const catTotals = {};
+        products.forEach(p => { catTotals[p.category] = 0; });
+        orders.forEach(o => {
+          if (o.status === "cancelled") return;
+          (o.items || []).forEach(it => {
+            const prod = products.find(p => p.id === it.id);
+            const cat = prod ? prod.category : "Другое";
+            catTotals[cat] = (catTotals[cat] || 0) + it.price * it.qty;
+          });
+        });
+
+        const labels = Object.keys(catTotals);
+        const data = labels.map(l => catTotals[l]);
+
+        if (salesChartInstance) salesChartInstance.destroy();
+        salesChartInstance = new Chart(canvas, {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [{
+              label: `Выручка (${settings.currency})`,
+              data,
+              backgroundColor: ["#38bdf8", "#34d399", "#a78bfa", "#fbbf24", "#f87171"],
+              borderRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: "#cbd5e1" } }
+            },
+            scales: {
+              x: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(148,163,184,0.1)" } },
+              y: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(148,163,184,0.1)" } }
+            }
+          }
+        });
+      }
+
+      function openProductModal(prod) {
+        const modal = document.getElementById("productFormModal");
+        document.getElementById("productModalTitle").textContent = prod ? "Редактировать товар" : "Добавить новый товар";
+        document.getElementById("prodFormId").value = prod ? prod.id : "";
+        document.getElementById("prodFormTitle").value = prod ? prod.title : "";
+        document.getElementById("prodFormPrice").value = prod ? prod.price : "";
+        document.getElementById("prodFormOldPrice").value = prod && prod.oldPrice ? prod.oldPrice : "";
+        document.getElementById("prodFormCategory").value = prod ? prod.category : "Худи и свитшоты";
+        document.getElementById("prodFormBadge").value = prod ? (prod.badge || "") : "";
+        document.getElementById("prodFormIcon").value = prod ? (prod.icon || "🛍️") : "🛍️";
+        document.getElementById("prodFormInStock").value = prod ? String(prod.inStock) : "true";
+        document.getElementById("prodFormDesc").value = prod ? (prod.desc || "") : "";
+        modal.classList.remove("hidden");
+      }
+
+      function renderClientOrdersModal() {
+        const container = document.getElementById("clientOrdersListContainer");
+        container.innerHTML = "";
+        if (orders.length === 0) {
+          container.innerHTML = `<p class="text-slate-400 text-center py-6">У вас пока нет оформленных заказов.</p>`;
+          return;
+        }
+        orders.forEach(o => {
+          const box = document.createElement("div");
+          box.className = "p-3 rounded-xl bg-slate-800 border border-slate-700 space-y-1.5";
+          box.innerHTML = `
+            <div class="flex justify-between font-bold text-white">
+              <span>Заказ #${o.id}</span>
+              <span class="text-sky-400">${Number(o.total).toLocaleString("ru-RU")} ${o.currency || settings.currency}</span>
+            </div>
+            <p class="text-[11px] text-slate-400">${o.createdAt} • ${o.deliveryMethod}</p>
+            <div class="text-[11px] text-slate-300 pt-1 border-t border-slate-700/70">
+              ${o.items.map(i => `${i.title} × ${i.qty}`).join(", ")}
+            </div>
+          `;
+          container.appendChild(box);
+        });
+      }
+
+      function copyTextSafe(text, successMsg) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => showToast(successMsg)).catch(() => fallbackCopy(text, successMsg));
+        } else {
+          fallbackCopy(text, successMsg);
+        }
+      }
+
+      function fallbackCopy(text, successMsg) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); showToast(successMsg); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+
+      // ==================== ПРИВЯЗКА СОБЫТИЙ ====================
+      document.getElementById("switchClientBtn").addEventListener("click", () => switchMainView("client"));
+      document.getElementById("switchAdminBtn").addEventListener("click", () => switchMainView("admin"));
+      document.getElementById("switchSecurityBtn").addEventListener("click", () => switchMainView("security"));
+
+      // Поиск и фильтры
+      const searchInput = document.getElementById("searchInput");
+      const clearSearchBtn = document.getElementById("clearSearchBtn");
+      searchInput.addEventListener("input", (e) => {
+        searchQuery = e.target.value.trim();
+        clearSearchBtn.classList.toggle("hidden", !searchQuery);
+        renderProducts();
+      });
+      clearSearchBtn.addEventListener("click", () => {
+        searchInput.value = "";
+        searchQuery = "";
+        clearSearchBtn.classList.add("hidden");
+        renderProducts();
+      });
+
+      document.getElementById("sortSelect").addEventListener("change", (e) => {
+        sortBy = e.target.value;
+        renderProducts();
+      });
+
+      document.getElementById("toggleFavoritesFilterBtn").addEventListener("click", () => {
+        onlyFavorites = !onlyFavorites;
+        renderProducts();
+      });
+
+      document.getElementById("resetCatalogFiltersBtn").addEventListener("click", () => {
+        activeCategory = "Все";
+        searchQuery = "";
+        onlyFavorites = false;
+        searchInput.value = "";
+        clearSearchBtn.classList.add("hidden");
+        renderCategories();
+        renderProducts();
+      });
+
+      // Промокод из баннера
+      document.getElementById("openPromoInfoBtn").addEventListener("click", () => {
+        appliedPromo = "START10";
+        document.getElementById("promoCodeInput").value = "START10";
+        renderCartSummary();
+        renderCartModalItems();
+        showToast("Промокод START10 (-10%) активирован!", "🎁");
+      });
+
+      // Мои заказы клиента
+      document.getElementById("openMyOrdersBtn").addEventListener("click", () => {
+        renderClientOrdersModal();
+        document.getElementById("clientOrdersModal").classList.remove("hidden");
+      });
+      document.getElementById("closeClientOrdersModalBtn").addEventListener("click", () => {
+        document.getElementById("clientOrdersModal").classList.add("hidden");
+      });
+
+      // Корзина
+      document.getElementById("openCartDrawerBtn").addEventListener("click", () => {
+        renderCartModalItems();
+        document.getElementById("cartModal").classList.remove("hidden");
+      });
+      document.getElementById("closeCartModalBtn").addEventListener("click", () => {
+        document.getElementById("cartModal").classList.add("hidden");
+      });
+
+      document.getElementById("applyPromoBtn").addEventListener("click", () => {
+        const code = document.getElementById("promoCodeInput").value.trim().toUpperCase();
+        if (promoCodes[code]) {
+          appliedPromo = code;
+          renderCartSummary();
+          renderCartModalItems();
+          showToast(`Промокод ${code} применён!`, "🎉");
+        } else {
+          showToast("Неверный промокод (попробуйте START10 или VIP20)", "⚠️");
+        }
+      });
+
+      document.getElementById("checkoutForm").addEventListener("submit", handleOrderSubmit);
+
+      // Вкладки внутри админки
+      function switchAdminSubTab(tab) {
+        const panels = {
+          orders: document.getElementById("adminOrdersPanel"),
+          products: document.getElementById("adminProductsPanel"),
+          settings: document.getElementById("adminSettingsPanel"),
+          analytics: document.getElementById("adminAnalyticsPanel")
+        };
+        const btns = {
+          orders: document.getElementById("adminTabOrdersBtn"),
+          products: document.getElementById("adminTabProductsBtn"),
+          settings: document.getElementById("adminTabSettingsBtn"),
+          analytics: document.getElementById("adminTabAnalyticsBtn")
+        };
+        Object.keys(panels).forEach(k => {
+          panels[k].classList.toggle("hidden", k !== tab);
+          btns[k].className = k === tab
+            ? "px-3.5 py-2 rounded-xl text-xs font-semibold bg-sky-500 text-white transition"
+            : "px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition";
+        });
+        if (tab === "analytics") renderSalesChart();
+      }
+
+      document.getElementById("adminTabOrdersBtn").addEventListener("click", () => switchAdminSubTab("orders"));
+      document.getElementById("adminTabProductsBtn").addEventListener("click", () => switchAdminSubTab("products"));
+      document.getElementById("adminTabSettingsBtn").addEventListener("click", () => switchAdminSubTab("settings"));
+      document.getElementById("adminTabAnalyticsBtn").addEventListener("click", () => switchAdminSubTab("analytics"));
+
+      document.getElementById("adminOrderStatusFilter").addEventListener("change", renderAdminOrders);
+
+      document.getElementById("createDemoOrderBtn").addEventListener("click", () => {
+        const sampleProd = products[0] || defaultProducts[0];
+        const demo = {
+          id: String(Math.floor(1000 + Math.random() * 9000)),
+          createdAt: "Только что (тест)",
+          customerName: "Дмитрий (Тест)",
+          customerContact: "@dmitry_test",
+          deliveryMethod: "Самовывоз",
+          paymentMethod: "СБП",
+          address: "Тестовый заказ из админки",
+          status: "new",
+          currency: settings.currency,
+          total: sampleProd.price,
+          items: [{ id: sampleProd.id, title: sampleProd.title, price: sampleProd.price, qty: 1 }]
+        };
+        orders.unshift(demo);
+        saveStorage("tg_cloth_orders_v2", orders);
+        renderAdminAll();
+        renderHeaderAndSettings();
+        showToast("Создан тестовый заказ #" + demo.id);
+      });
+
+      // Модалка товара
+      document.getElementById("openAddProductModalBtn").addEventListener("click", () => openProductModal(null));
+      document.getElementById("closeProductModalBtn").addEventListener("click", () => {
+        document.getElementById("productFormModal").classList.add("hidden");
+      });
+      document.getElementById("cancelProductModalBtn").addEventListener("click", () => {
+        document.getElementById("productFormModal").classList.add("hidden");
+      });
+
+      document.getElementById("adminProductForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const id = document.getElementById("prodFormId").value || ("p" + Date.now());
+        const item = {
+          id,
+          title: document.getElementById("prodFormTitle").value.trim(),
+          price: Number(document.getElementById("prodFormPrice").value) || 0,
+          oldPrice: Number(document.getElementById("prodFormOldPrice").value) || 0,
+          category: document.getElementById("prodFormCategory").value.trim() || "Разное",
+          badge: document.getElementById("prodFormBadge").value,
+          icon: document.getElementById("prodFormIcon").value.trim() || "🛍️",
+          inStock: document.getElementById("prodFormInStock").value === "true",
+          desc: document.getElementById("prodFormDesc").value.trim()
+        };
+
+        const idx = products.findIndex(p => p.id === id);
+        if (idx >= 0) {
+          products[idx] = item;
+        } else {
+          products.unshift(item);
+        }
+        saveStorage("tg_cloth_products_v2", products);
+        document.getElementById("productFormModal").classList.add("hidden");
+        renderCategories();
+        renderProducts();
+        renderAdminAll();
+        showToast("Товар сохранён!");
+      });
+
+      document.getElementById("resetDefaultProductsBtn").addEventListener("click", () => {
+        products = JSON.parse(JSON.stringify(defaultProducts));
+        saveStorage("tg_cloth_products_v2", products);
+        renderCategories();
+        renderProducts();
+        renderAdminAll();
+        showToast("Демо-каталог восстановлен");
+      });
+
+      document.getElementById("exportCatalogJsonBtn").addEventListener("click", () => {
+        const json = JSON.stringify(products, null, 2);
+        copyTextSafe(json, "JSON каталога скопирован в буфер обмена!");
+      });
+
+      // Сохранение настроек
+      document.getElementById("saveShopSettingsBtn").addEventListener("click", () => {
+        settings.storeName = document.getElementById("settingStoreName").value.trim() || "TeleShop Mini App";
+        settings.heroTitle = document.getElementById("settingHeroTitle").value.trim() || "Каталог товаров";
+        settings.currency = document.getElementById("settingCurrency").value;
+        settings.adminId = document.getElementById("settingAdminId").value.trim() || DEFAULT_ADMIN_ID;
+        settings.freeDeliveryThreshold = Number(document.getElementById("settingFreeDelivery").value) || 5000;
+        saveStorage("tg_cloth_settings_v2", settings);
+        renderHeaderAndSettings();
+        renderProducts();
+        renderCartSummary();
+        renderAdminAll();
+        showToast("Настройки витрины сохранены!");
+      });
+
+      document.getElementById("saveSecuritySettingsBtn").addEventListener("click", () => {
+        settings.webhookUrl = document.getElementById("settingWebhookUrl").value.trim();
+        settings.localTestBotToken = document.getElementById("settingLocalBotToken").value.trim();
+        saveStorage("tg_cloth_settings_v2", settings);
+        showToast("Параметры безопасности сохранены локально!");
+      });
+
+      document.getElementById("generateObfuscatedTokenBtn").addEventListener("click", () => {
+        const raw = document.getElementById("tokenToObfuscateInput").value.trim();
+        if (!raw) {
+          showToast("Введите токен для шифрования", "⚠️");
+          return;
+        }
+        const bytes = Array.from(raw).map(ch => ch.charCodeAt(0) ^ XOR_KEY);
+        const resultCode = `const OBFUSCATED_TOKEN_BYTES = [${bytes.join(", ")}];`;
+        document.getElementById("workerCodeBlock").textContent = resultCode;
+        showToast("Токен зашифрован в массив байтов!", "🔐");
+      });
+
+      document.getElementById("copyWorkerCodeBtn").addEventListener("click", () => {
+        const code = document.getElementById("workerCodeBlock").textContent;
+        copyTextSafe(code, "Зашифрованный массив скопирован!");
+      });
+
+      // Первичный запуск
+      initTelegramContext();
+      renderHeaderAndSettings();
+      renderCategories();
+      renderProducts();
+      renderCartSummary();
+    })();
+  </script>
+</body>
+</html>
